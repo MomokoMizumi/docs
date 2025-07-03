@@ -23,7 +23,10 @@
             "group": "Everything Bash",
             "pages": [
               "bash/intro",
-              "bash/cheatsheet"
+              {
+              "group": "Scripting",
+              "pages": ["bash/cheatsheet"]
+              }
             ]
           },
           {
