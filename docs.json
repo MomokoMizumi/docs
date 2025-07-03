@@ -3,20 +3,27 @@
   "theme": "mint",
   "name": "Momos Knowledge Base",
   "colors": {
-    "primary": "#FECCFF",
-    "light": "#A780B3",
+    "primary": "#A780B3",
+    "light": "#CB97CB",
     "dark": "#A780B3"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/fav.gif",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Docs",
         "groups": [
           {
             "group": "Home",
             "pages": [
               "index"
+            ]
+          },
+          {
+            "group": "Everything Bash",
+            "pages": [
+              "bash/intro",
+              "bash/cheatsheet"
             ]
           },
           {
@@ -31,57 +38,37 @@
             ]
           }
         ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "API Documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint Examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
       }
     ],
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
+          "anchor": "Anime-Planet Profile",
+          "href": "https://www.anime-planet.com/users/MomokoMizumi",
           "icon": "book-open-cover"
         },
         {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
+          "anchor": "My Other Website",
+          "href": "https://momonya.moe",
+          "icon": "cat"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Spotify Profile",
+          "href": "https://open.spotify.com/user/slaashed?si=0f3497200cb04646",
+          "icon": "spotify"
         }
       ]
     }
   },
   "logo": {
-    "light": "/logo/banner.png",
-    "dark": "/logo/banner.png"
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
   },
   "navbar": {
     "links": [
       {
-        "label": "nya",
-        "href": "https://momonya.moe"
+        "label": "Peak",
+        "href": "https://www.youtube.com/watch?v=44gNQRw5Oes"
       }
     ],
     "primary": {
