@@ -4,7 +4,7 @@
   "name": "Momos Knowledge Base",
   "colors": {
     "primary": "#FECCFF",
-    "light": "#D2A3E0",
+    "light": "#A780B3",
     "dark": "#A780B3"
   },
   "favicon": "/favicon.svg",
@@ -74,8 +74,8 @@
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/banner.png",
+    "dark": "/logo/banner.png"
   },
   "navbar": {
     "links": [
