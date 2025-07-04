@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "maple",
   "name": "Momos Knowledge Base",
   "colors": {
     "primary": "#A780B3",
