@@ -1,23 +1,23 @@
 ---
 title: "Scripts"
 description: "Scripts I have made to make things somewhat easier"
-mode: "wide"
 sidebarTitle: "Scripts"
 ---
-
 
 ### **cPanel Database Import script**
 
 ---
 
-This just makes live easier importing databases into cPanel and saves me time. This will create the database using cPanel's uapi, create database user and password, assign all privelages and then import the database from the file to the newly created database.  
+This just makes live easier importing databases into cPanel and saves me time. This will create the database using cPanel's uapi, create database user and password, assign all privelages and then import the database from the file to the newly created database.
 
 <AccordionGroup>
   <Accordion title="Command" defaultOpen icon="code">
-    `curl -s https://scripts.momonya.moe/dbimport | bash -s filename.sql dbsuffix` 
+    ```bash
+    curl -s https://scripts.momonya.moe/dbimport | bash -s filename.sql dbsuffix
+    ```
   </Accordion>
   <Accordion title="Source" icon="code-branch">
-    ```bash expandable
+    ```bash
     #!/bin/bash
     
     
@@ -66,11 +66,13 @@ Made to provide breakdowns to customers, Shows the top 10 directories that are u
 
 <AccordionGroup>
   <Accordion title="Command" defaultOpen icon="code">
-    `bash <(curl -s https://scripts.momonya.moe/inode)`
+    ```bash
+    bash <(curl -s https://scripts.momonya.moe/inode)
+    ```
   </Accordion>
   <Accordion title="Source" icon="code-branch">
     ```bash
-    #!/bin/bash
+    /bin/bash
     echo "Detailed Inode usage for account $(whoami)";  { find . -xdev -printf '%h\n' | sort | uniq -c | sort -rn; } 2>/dev/null | head ; printf "Total: \t\t$(find $(pwd) | wc -l)\n"
     ```
   </Accordion>
@@ -82,7 +84,7 @@ Made to provide breakdowns to customers, Shows the top 10 directories that are u
 
 ---
 
- Does an IP lookup to [ipinfo.io](http://ipinfo.io) and finds the geolocation, hostname, city, and a bit more and prints it nicely.
+Does an IP lookup to [ipinfo.io](http://ipinfo.io) and finds the geolocation, hostname, city, and a bit more and prints it nicely.
 
 <AccordionGroup>
   <Accordion title="Source" icon="code-branch">
@@ -130,7 +132,7 @@ Made to provide breakdowns to customers, Shows the top 10 directories that are u
       <Step title="All done!">
         All you need to do is run in your terminal `ip 1.1.1.1` (of course replacing 1.1.1.1 with the IP you would like to lookup) and it'll print out some nice info
 
-        ```shellscript
+        ```bash
         $ ip 1.1.1.1
         ip: 1.1.1.1
         hostname: one.one.one.one
@@ -149,7 +151,6 @@ Made to provide breakdowns to customers, Shows the top 10 directories that are u
   </Accordion>
 </AccordionGroup>
 
-
 ## **Traffic Scanner**
 
 ---
@@ -158,10 +159,12 @@ Tails the domlogs of the server over 30 seconds and collects the IP addresses th
 
 <AccordionGroup>
   <Accordion title="Command" defaultOpen icon="code">
-    `bash <(curl -s https://scripts.momonya.moe/traffic)`
+    ```bash
+    bash <(curl -s https://scripts.momonya.moe/traffic)
+    ```
   </Accordion>
   <Accordion title="Source" icon="code-branch">
-    ```shellscript Trafficscan.sh expandable
+    ```bash Trafficscan.sh
     #! /bin/bash
     # The function to scan all the access logs and record what they are doing
     function traffictrap {
@@ -204,8 +207,7 @@ Tails the domlogs of the server over 30 seconds and collects the IP addresses th
   </Accordion>
 </AccordionGroup>
 
-
-  **Usage:** Copy pasta and run in terminal
+**Usage:** Copy pasta and run in terminal
 
 ### **SSL Checker**
 
@@ -215,7 +217,7 @@ This script checks a websites SSL certificate and sees if its valid
 
 <AccordionGroup>
   <Accordion title="Example" defaultOpen icon="code">
-    ```shellscript
+    ```bash
     $ ssl momonya.moe
     Checking SSL certificate for: momonya.moe
     --------------------------------------------------
@@ -227,7 +229,7 @@ This script checks a websites SSL certificate and sees if its valid
     ```
   </Accordion>
   <Accordion title="Source" icon="code-branch">
-    ```shellscript
+    ```bash
     #!/bin/bash
     
     # Function to check SSL certificate validity
@@ -304,4 +306,4 @@ This script checks a websites SSL certificate and sees if its valid
   </Accordion>
 </AccordionGroup>
 
-**Usage: **ssl \<domain\> (-v verbose)
+**Usage:** ssl \<domain\> (-v verbose)
