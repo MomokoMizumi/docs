@@ -1,0 +1,307 @@
+---
+title: "Scripts"
+description: "Scripts I have made to make things somewhat easier"
+mode: "wide"
+sidebarTitle: "Scripts"
+---
+
+
+### **cPanel Database Import script**
+
+---
+
+This just makes live easier importing databases into cPanel and saves me time. This will create the database using cPanel's uapi, create database user and password, assign all privelages and then import the database from the file to the newly created database.  
+
+<AccordionGroup>
+  <Accordion title="Command" defaultOpen icon="code">
+    `curl -s https://scripts.momonya.moe/dbimport | bash -s filename.sql dbsuffix` 
+  </Accordion>
+  <Accordion title="Source" icon="code-branch">
+    ```bash expandable
+    #!/bin/bash
+    
+    
+    # Database import script
+    
+    set -x
+    database=$1
+    path=$(find /home/$USER -name $database)
+    update=$3
+    name=${USER}_${2}
+    password=$(openssl rand -hex 27)
+    
+    dbinfo() {
+        user=$(grep "DB_USER" /home/$USER/public_html/wp-config.php | awk -F ',' '{print $2}' | awk -F "'" '{print $2}')
+        db=$(grep "DB_NAME" /home/$USER/public_html/wp-config.php | awk -F ',' '{print $2}' | awk -F "'" '{print $2}')
+        pass=$(grep "DB_PASSWORD" /home/$USER/public_html/wp-config.php | awk -F ',' '{print $2}' | awk -F "'" '{print $2}')
+        prefix=$(grep "table_prefix" /home/$USER/public_html/wp-config.php | awk -F '=' '{print $2}' | awk -F "'" '{print $2}')
+        }
+    
+    cp -f $path ${path}_bak
+    sed -i -e 's/CREATE DATABASE/\#CREATE DATABASE/' -e 's/utf8mb4_0900_ai_ci/utf8mb4_unicode_ci/g' -e 's/utf8mb4_unicode_520_ci/utf8mb4_unicode_ci/g' ${path}_bak
+    uapi Mysql create_user name=$name password="${password}" >/dev/null
+    uapi Mysql create_database name=$name >/dev/null
+    uapi Mysql set_privileges_on_database user=$name database=$name privileges="ALL PRIVILEGES" >/dev/null
+    mysql -u $name -p"${password}" $name < ${path}_bak
+    
+    
+    newprefix=$(mysql -u $name -p"${password}" $name -Nse "SHOW TABLES;" | grep '_options' | awk -F '_' '{print $1}')
+    if [[ -n $update ]]; then
+        dbinfo
+        sed  -i -e "s/$user/$name/g" -e "s/${db}/${name}/g" -e "s/${pass}/${password}/g" -e "s/${prefix}/${newprefix}_/g" /home/$USER/public_html/wp-config.php
+    elif [[ -z $update ]]; then
+        echo -e "DB Name: ${name}\nDB User: ${name}\nPassword: ${password}"
+    fi
+    ```
+  </Accordion>
+</AccordionGroup>
+
+**Usage:** Upload a database to the home directory, run above as cPanel user and replace "filename.sql" with the filename of the database, and dbsuffix with the suffix you want the database to be created on.
+
+### **Inode Finder**
+
+---
+
+Made to provide breakdowns to customers, Shows the top 10 directories that are using the most amount of files/inodes and prints a total for the account.
+
+<AccordionGroup>
+  <Accordion title="Command" defaultOpen icon="code">
+    `bash <(curl -s https://scripts.momonya.moe/inode)`
+  </Accordion>
+  <Accordion title="Source" icon="code-branch">
+    ```bash
+    #!/bin/bash
+    echo "Detailed Inode usage for account $(whoami)";  { find . -xdev -printf '%h\n' | sort | uniq -c | sort -rn; } 2>/dev/null | head ; printf "Total: \t\t$(find $(pwd) | wc -l)\n"
+    ```
+  </Accordion>
+</AccordionGroup>
+
+**Usage:** Copy pasta the command and run in terminal within the cPanel user.
+
+### **IP Lookup**
+
+---
+
+ Does an IP lookup to [ipinfo.io](http://ipinfo.io) and finds the geolocation, hostname, city, and a bit more and prints it nicely.
+
+<AccordionGroup>
+  <Accordion title="Source" icon="code-branch">
+    ```bash
+    #!/bin/bash
+    ip=${1}
+    
+    if [[ $# -eq 0 ]]; then
+        echo -e "\nNot an IP address"
+        exit 0
+    else
+        curl -s ipinfo.io/$ip | jq -r 'to_entries | map("\(.key): \(.value)") | .[]' | awk 'BEGIN {
+            key_color="\033[38;5;141m"; # purple
+            value_color="\033[38;5;153m"; # light sky blue
+            reset="\033[0m"; # reset to default color
+        } {
+            key = $1;
+            sub(/:/, "", key);
+            value = substr($0, length(key)+3);
+            gsub(/^ +| +$/, "", value); # Remove leading and trailing spaces
+            printf "%s%s%s: %s%s%s\n", key_color, key, reset, value_color, value, reset;
+        }'
+    fi
+    ```
+  </Accordion>
+  <Accordion title="Steps to alias" icon="code">
+    <Steps>
+      <Step title="Make a directory">
+        You can put this anywhere you like, but for this example we will be putting it under the **~/.local/bin** directory
+
+        ```bash
+        mkdir -p ~/.local/bin
+        ```
+      </Step>
+      <Step title="Get the script and make it executable">
+        ```bash
+        curl -4 -s https://scripts.momonya.moe/ipinfo > ~/.local/bin/ipinfo && chmod +x ~/.local/bin/ipinfo
+        ```
+      </Step>
+      <Step title="Alias dat bitch">
+        ```bash
+        echo "alias ip='/bin/bash ~/.local/bin/ipinfo'" >> ~/.bashrc && source ~/.bashrc
+        ```
+      </Step>
+      <Step title="All done!">
+        All you need to do is run in your terminal `ip 1.1.1.1` (of course replacing 1.1.1.1 with the IP you would like to lookup) and it'll print out some nice info
+
+        ```shellscript
+        $ ip 1.1.1.1
+        ip: 1.1.1.1
+        hostname: one.one.one.one
+        city: Brisbane
+        region: Queensland
+        country: AU
+        loc: -27.4816,153.0175
+        org: AS13335 Cloudflare, Inc.
+        postal: 4101
+        timezone: Australia/Brisbane
+        readme: https://ipinfo.io/missingauth
+        anycast: true
+        ```
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+
+## **Traffic Scanner**
+
+---
+
+Tails the domlogs of the server over 30 seconds and collects the IP addresses that make requests, sorts by number of hits and displays them with request urls and user agents
+
+<AccordionGroup>
+  <Accordion title="Command" defaultOpen icon="code">
+    `bash <(curl -s https://scripts.momonya.moe/traffic)`
+  </Accordion>
+  <Accordion title="Source" icon="code-branch">
+    ```shellscript Trafficscan.sh expandable
+    #! /bin/bash
+    # The function to scan all the access logs and record what they are doing
+    function traffictrap {
+            find /etc/apache2/logs/domlogs/ -maxdepth 1 -type f -mmin -2 | egrep -v 'ftp_log|bytes_log' | xargs tail -qfn0 | grep -v "==>" > /tmp/trafficlog.txt
+    }
+    
+    # Export the function and then kill it after 30 seconds
+    if [ $# -eq 0 ]; then
+            # If we have arguments, probably a fleet wide command, remove the echos
+            echo "Collecting data for 30 seconds, please wait..."
+    fi
+    export -f traffictrap
+    timeout 30s bash -c traffictrap
+    
+    if [ $# -eq 0 ]; then
+        # FIND COMMON BOTS
+            echo "Most common bots found:"
+            grep -io "\w*bot\w*" /tmp/trafficlog.txt | sort | uniq -c | sort -n
+            echo ------------------------------------------------------------
+            echo ------------------------------------------------------------
+    
+            # FIND COMMON IP'S
+            echo "Most requests per IPs found:"
+            cat /tmp/trafficlog.txt | awk '{print $1}' | sort -n | uniq -c| sort -n | tail -15
+            echo ------------------------------------------------------------
+            echo ------------------------------------------------------------
+    
+            # FIND COMMON HITS
+            echo "Most common requested IPs"
+            cat /tmp/trafficlog.txt | grep -oP '(?<=] ").*(?="\s\d)' | sort | uniq -c | sort -n | tail -15
+            echo ------------------------------------------------------------
+            echo ------------------------------------------------------------
+            echo "If you are suspicous of an IP, run the following command entering part of all of the IP at the end"
+            echo "find /etc/apache2/logs/domlogs/ -maxdepth 1 -type f -mmin -2 | egrep -v 'ftp_log|bytes_log' | xargs tail -qfn0 | grep -v '==>' | grep"
+    
+    elif [[ $1 == "bot" ]]; then
+                    echo $(hostname -s) " - " $(grep -io "\w*bot\w*" /tmp/trafficlog.txt | sort | uniq -c | sort)
+    fi
+    ```
+  </Accordion>
+</AccordionGroup>
+
+
+  **Usage:** Copy pasta and run in terminal
+
+### **SSL Checker**
+
+---
+
+This script checks a websites SSL certificate and sees if its valid
+
+<AccordionGroup>
+  <Accordion title="Example" defaultOpen icon="code">
+    ```shellscript
+    $ ssl momonya.moe
+    Checking SSL certificate for: momonya.moe
+    --------------------------------------------------
+    Summary:
+      Valid From: Jul  8 17:56:41 2025 GMT
+      Valid To:   Oct  6 18:54:55 2025 GMT
+      Status:     VALID (within validity period)
+    --------------------------------------------------
+    ```
+  </Accordion>
+  <Accordion title="Source" icon="code-branch">
+    ```shellscript
+    #!/bin/bash
+    
+    # Function to check SSL certificate validity
+    ssl_check() {
+        if [ -z "$1" ]; then
+            echo "Usage: ssl <domain_name> [-v]"
+            echo "Example: ssl example.com"
+            echo "         ssl example.com -v (for verbose output)"
+            exit 0
+        fi
+    
+        DOMAIN=$1
+        PORT=443
+        VERBOSE=false
+    
+        if [ "$2" == "-v" ]; then
+            VERBOSE=true
+        fi
+    
+        echo -e "Checking SSL certificate for: \033[38;5;204m$DOMAIN\033[0m"
+        echo "--------------------------------------------------"
+    
+        if $VERBOSE; then
+            echo "Fetching certificate details..."
+        fi
+        CERT_DETAILS=$(echo "Q" | openssl s_client -servername "$DOMAIN" -connect "$DOMAIN":"$PORT" 2>/dev/null | openssl x509 -noout -text)
+    
+        if [ -z "$CERT_DETAILS" ]; then
+            echo "Error: Could not retrieve certificate details. The domain might not be reachable on port $PORT or does not have a valid SSL certificate."
+            return 1
+        fi
+    
+        if $VERBOSE; then
+            echo "$CERT_DETAILS"
+            echo "--------------------------------------------------"
+        fi
+    
+        if $VERBOSE; then
+            echo "Checking certificate validity dates..."
+        fi
+        VALIDITY_DATES=$(echo "Q" | openssl s_client -servername "$DOMAIN" -connect "$DOMAIN":"$PORT" 2>/dev/null | openssl x509 -noout -dates)
+    
+        if [ -z "$VALIDITY_DATES" ]; then
+            echo "Error: Could not retrieve validity dates."
+            return 1
+        fi
+    
+        if $VERBOSE; then
+            echo "$VALIDITY_DATES"
+            echo "--------------------------------------------------"
+        fi
+    
+        NOT_BEFORE=$(echo "$VALIDITY_DATES" | grep "notBefore" | cut -d'=' -f2)
+        NOT_AFTER=$(echo "$VALIDITY_DATES" | grep "notAfter" | cut -d'=' -f2)
+    
+        echo -e "\033[38;5;204mSummary:\033[0m"
+        echo "  Valid From: $NOT_BEFORE"
+        echo "  Valid To:   $NOT_AFTER"
+    
+        NOT_BEFORE_SEC=$(date -d "$NOT_BEFORE" +%s)
+        NOT_AFTER_SEC=$(date -d "$NOT_AFTER" +%s)
+        CURRENT_DATE_SEC=$(date +%s)
+    
+        if (( CURRENT_DATE_SEC >= NOT_BEFORE_SEC && CURRENT_DATE_SEC <= NOT_AFTER_SEC )); then
+            printf "  Status:     \033[38;5;10mVALID\033[0m (within validity period)\n"
+        else
+            printf "  Status:     \033[38;5;9mEXPIRED\033[0m or \033[38;5;9mNOT VALID\033[0m\n"
+        fi
+        echo "--------------------------------------------------"
+    }
+    
+    ssl_check "$@"
+    ```
+  </Accordion>
+</AccordionGroup>
+
+**Usage: **ssl \<domain\> (-v verbose)
