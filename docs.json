@@ -26,20 +26,10 @@
                             {
                                 "group": "Scripting",
                                 "pages": [
-                                    "bash/cheatsheet"
+                                    "bash/cheatsheet",
+                                    "bash/scripts"
                                 ]
                             }
-                        ]
-                    },
-                    {
-                        "group": "Essentials",
-                        "pages": [
-                            "essentials/markdown",
-                            "essentials/code",
-                            "essentials/images",
-                            "essentials/settings",
-                            "essentials/navigation",
-                            "essentials/reusable-snippets"
                         ]
                     }
                 ]
